@@ -1,16 +1,150 @@
 ossec:
   role: agent
+  server_ip: 203.0.113.0
+  server_port: 1515
+
+ossec:
+  role: server
   config:
-    language: en
-    userdir: /var/ossec
-    en_active_response: y
-    en_syscheck: y
-    en_rootcheck: y
-    en_update_rules: y
-    en_syslog: y
-    server_ip: 172.16.0.4
-    en_email: n
-    email_address: disabled
-    white-list: 172.16.0.0/24
-    uid: 7000
-    gid: 7000
+    ossec_server_conf:
+      source: pillar
+      ossec_config:
+        - global:
+          - email_notification: 'yes'
+          - email_to: 'daniel.cid@example.com'
+          - smtp_server: 'smtp.example.com'
+          - email_from: 'ossecm@ossec.example.com'
+          - white_list: 127.0.0.1
+          - white_list: '::1'
+          - white_list: 192.168.2.1
+          - white_list: 192.168.2.190
+          - white_list: 192.168.2.32
+          - white_list: 192.168.2.10
+        - rules:
+          - include: rules_config.xml
+          - include: pam_rules.xml
+          - include: sshd_rules.xml
+          - include: telnetd_rules.xml
+          - include: syslog_rules.xml
+          - include: arpwatch_rules.xml
+          - include: symantec-av_rules.xml
+          - include: symantec-ws_rules.xml
+          - include: pix_rules.xml
+          - include: named_rules.xml
+          - include: smbd_rules.xml
+          - include: vsftpd_rules.xml
+          - include: pure-ftpd_rules.xml
+          - include: proftpd_rules.xml
+          - include: ms_ftpd_rules.xml
+          - include: ftpd_rules.xml
+          - include: hordeimp_rules.xml
+          - include: roundcube_rules.xml
+          - include: wordpress_rules.xml
+          - include: cimserver_rules.xml
+          - include: vpopmail_rules.xml
+          - include: vmpop3d_rules.xml
+          - include: courier_rules.xml
+          - include: web_rules.xml
+          - include: web_appsec_rules.xml
+          - include: apache_rules.xml
+          - include: nginx_rules.xml
+          - include: php_rules.xml
+          - include: mysql_rules.xml
+          - include: postgresql_rules.xml
+          - include: ids_rules.xml
+          - include: squid_rules.xml
+          - include: firewall_rules.xml
+          - include: apparmor_rules.xml
+          - include: cisco-ios_rules.xml
+          - include: netscreenfw_rules.xml
+          - include: sonicwall_rules.xml
+          - include: postfix_rules.xml
+          - include: sendmail_rules.xml
+          - include: imapd_rules.xml
+          - include: mailscanner_rules.xml
+          - include: dovecot_rules.xml
+          - include: ms-exchange_rules.xml
+          - include: racoon_rules.xml
+          - include: vpn_concentrator_rules.xml
+          - include: spamd_rules.xml
+          - include: msauth_rules.xml
+          - include: mcafee_av_rules.xml
+          - include: trend-osce_rules.xml
+          - include: ms-se_rules.xml
+          - include: zeus_rules.xml
+          - include: solaris_bsm_rules.xml
+          - include: vmware_rules.xml
+          - include: ms_dhcp_rules.xml
+          - include: asterisk_rules.xml
+          - include: ossec_rules.xml
+          - include: attack_rules.xml
+          - include: dropbear_rules.xml
+          - include: unbound_rules.xml
+          - include: sysmon_rules.xml
+          - include: opensmtpd_rules.xml
+          - include: local_rules.xml
+        - syscheck:
+          - frequency: 72000
+          - 'directories check_all="yes"': '/etc,/usr/bin,/usr/sbin'
+          - 'directories check_all="yes"': '/bin,/sbin,/boot'
+          - ignore: /etc/mtab
+          - ignore: /etc/hosts.deny
+          - ignore: /etc/mail/statistics
+          - ignore: /etc/random-seed
+          - ignore: /etc/adjtime
+          - ignore: /etc/httpd/logs
+          - nodiff: /etc/ssl/private.key
+        - rootcheck:
+          - rootkit_files: /var/ossec/etc/shared/rootkit_files.txt
+          - rootkit_trojans: /var/ossec/etc/shared/rootkit_trojans.txt
+        - remote:
+          - connection: secure
+        - alerts:
+          - log_alert_level: 1
+          - email_alert_level: 7
+        - command:
+          - name: host-deny
+          - executable: host-deny.sh
+          - expect: srcip
+          - timeout_allowed: 'yes'
+        - command:
+          - name: firewall-drop
+          - executable: firewall-drop.sh
+          - expect: srcip
+          - timeout_allowed: 'yes'
+        - command:
+          - name: disable-account
+          - executable: disable-account.sh
+          - expect: srcip
+          - timeout_allowed: 'yes'
+        - active-response:
+          - command: host-deny
+          - location: local
+          - level: 6
+          - timeout: 600
+        - active-response:
+          - command: firewall-drop
+          - location: local
+          - level: 6
+          - timeout: 600
+        - localfile:
+          - log_format: syslog
+          - location: /var/log/messages
+        - localfile:
+          - log_format: syslog
+          - location: /var/log/authlog
+        - localfile:
+          - log_format: syslog
+          - location: /var/log/secure
+        - localfile:
+          - log_format: syslog
+          - location: /var/log/xferlog
+        - localfile:
+          - log_format: syslog
+          - location: /var/log/maillog
+        - localfile:
+          - log_format: apache
+          - location: /var/www/logs/access_log
+        - localfile:
+          - log_format: apache
+          - location: /var/www/logs/error_log

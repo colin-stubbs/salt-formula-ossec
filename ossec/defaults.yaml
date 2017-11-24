@@ -38,4 +38,5 @@ ossec:
     ossec_agent_conf:
       source_file: salt://ossec/files/ossec-agent.conf
     ossec_server_conf:
+      source: file
       source_file: salt://ossec/files/ossec-server.conf
