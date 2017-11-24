@@ -8,7 +8,7 @@
   <{{ section_name }}>
   {%- for avp in section_dict %}
   {%- for attribute_name, value in avp.items() %}
-    <{{ attribute_name }}>{{ value }}</{{ attribute_name }}>
+    <{{ attribute_name }}>{{ value }}</{{ attribute_name.split()[0] }}>
   {%- endfor %}
   {%- endfor %}
   </{{ section_name }}>
