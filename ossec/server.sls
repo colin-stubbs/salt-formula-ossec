@@ -24,6 +24,8 @@ ossec-server-packages:
   file.managed:
     - source: salt://ossec/files/ossec-server.conf.jinja
     - template: jinja
+    - context:
+      ossec_map: {{ ossec_map }}
     - user: root
     - group: root
     - mode: 0644
