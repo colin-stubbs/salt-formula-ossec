@@ -1,3 +1,5 @@
+{# ossec.server #}
+
 {% from "ossec/map.jinja" import ossec_map with context %}
 
 include:
@@ -17,12 +19,22 @@ ossec-server-packages:
     - mode: 0644
 {% endif %}
 
+{% if ossec_map.config.ossec_server_conf.source|default('pillar') == 'pillar' %}
+{{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+  file.managed:
+    - source: salt://ossec/files/ossec-server.conf.jinja
+    - template: jinja
+    - user: root
+    - group: root
+    - mode: 0644
+{% elif 'source_file' in ossec_map.config.ossec_server_conf %}
 {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
   file.managed:
     - source: {{ ossec_map.config.ossec_server_conf.source_file }}
     - user: root
     - group: root
     - mode: 0644
+{% endif %}
 
 {{ ossec_map.lookup.locations.base_dir }}/etc/templates:
   file.directory:
