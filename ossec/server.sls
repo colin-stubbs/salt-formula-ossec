@@ -3,56 +3,82 @@
 include:
   - ossec
 
+{% if 'role' in ossec_map and ossec_map.role == 'server' %}
 ossec-server-packages:
   pkg.installed:
-    - pkgs:
-      - ossec-hids-server
-      - ossec-hids
+    - pkgs: {{ ossec_map.lookup.server.pkgs }}
 
-ssl-key:
-  cmd.run:
-    - name: openssl genrsa -out {{ ossec_map.userdir }}/etc/sslmanager.key 2048
-    - unless: stat {{ ossec_map.userdir }}/etc/sslmanager.key
-    - require:
-      - pkg: ossec-server-packages
-
-ssl-cert:
-  cmd.run:
-    - name: openssl req -subj 
-            '/CN={{ grains['id'] }}/C={{ salt['pillar.get']('openssl:countrynamedefault', 'US') -}}
-            /ST={{ salt['pillar.get']('openssl:stateorprovincenamedefault', 'AK') -}}
-            /O={{ salt['pillar.get']('openssl:orgnamedefault', 'Example Org') }}'
-            -new -x509 -key {{ ossec_map.userdir }}/etc/sslmanager.key 
-            -out {{ ossec_map.userdir }}/etc/sslmanager.cert 
-            -days 730
-    - unless: stat {{ ossec_map.userdir }}/etc/sslmanager.cert 
-    - onlyif: stat {{ ossec_map.userdir }}/etc/sslmanager.key
-    - require:
-      - cmd: ssl-key
-
-ossec-local_rules:
+{% if ossec_map.manage_internal_options == True %}
+{{ ossec_map.lookup.locations.base_dir }}/etc/internal_options.conf:
   file.managed:
-    - name: /var/ossec/rules/local_rules.xml
-    - source: salt://ossec/files/local_rules.xml
-    - template: jinja
+    - source: {{ ossec_map.config.internal_options.source_file }}
+    - user: root
+    - group: root
+    - mode: 0644
+{% endif %}
+
+{{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+  file.managed:
+    - source: {{ ossec_map.config.ossec_server_conf.source_file }}
     - user: root
     - group: root
     - mode: 0644
 
+{{ ossec_map.lookup.locations.base_dir }}/etc/templates:
+  file.directory:
+    - source: {{ ossec_map.config.templates.source_dir }}
+    - user: root
+    - group: root
+    - mode: 0755
+
+{{ ossec_map.lookup.locations.base_dir }}/etc/shared:
+  file.directory:
+    - source: {{ ossec_map.config.shared.source_dir }}
+    - user: root
+    - group: root
+    - mode: 0755
+
+{{ ossec_map.lookup.locations.base_dir }}/etc/decoders.d:
+  file.directory:
+    - source: {{ ossec_map.config.decoders_d.source_dir }}
+    - user: root
+    - group: root
+    - mode: 0755
+
+{{ ossec_map.lookup.locations.base_dir }}/etc/rules.d:
+  file.directory:
+    - source: {{ ossec_map.config.rules_d.source_dir }}
+    - user: root
+    - group: root
+    - mode: 0755
+
 ossec-service:
   service.running:
-    - name: ossec-hids
+    - name: {{ ossec_map.lookup.service_name }}
     - enable: True
     - require:
-      - cmd: ssl-cert
-      - file: ossec-local_rules
+      - pkg: ossec-server-packages
+      {% if ossec_map.manage_internal_options == True %}
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/internal_options.conf:
+      {% endif %}
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/templates
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/shared
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/decoders.d
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/rules.d
     - watch:
       - pkg: ossec-server-packages
-      - cmd: ssl-cert
-      - file: ossec-local_rules
+      {% if ossec_map.manage_internal_options == True %}
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/internal_options.conf:
+      {% endif %}
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/templates
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/shared
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/decoders.d
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/rules.d
 
 {# Since OSSEC does not recommend keeping authd running my workaround so far is to run a cron job
-   to shut it off after a period of time. I need to figure out a better way of doing this in the 
+   to shut it off after a period of time. I need to figure out a better way of doing this in the
    future as this may require more than one highstate to add keys for a client and it is cheesy #}
 
 cron-kill-ossec-authd:
@@ -60,3 +86,6 @@ cron-kill-ossec-authd:
     - name: 'pkill ossec-authd >/dev/null 2>&1'
     - user: root
     - minute: '*/5'
+{% endif %}
+
+{# EOF #}

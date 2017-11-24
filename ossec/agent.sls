@@ -3,26 +3,25 @@
 include:
   - ossec
 
+{% if 'role' in ossec_map and ossec_map.role == 'agent' %}
 ossec-agent-packages:
   pkg.installed:
-    - pkgs:
-      - ossec-hids
-      - ossec-hids-agent
+    - pkgs: {{ ossec_map.lookup.agent.pkgs }}
 
 {# Use events/reactor system to start up the ossec-authd process on the OSSEC master #}
 server-auth:
   cmd.run:
     - name: salt-call event.fire_master 'ossec-auth-start' 'ossec'
-    - unless: stat {{ ossec_map.userdir }}/etc/client.keys
+    - unless: stat {{ ossec_map.lookup.locations.base_dir }}/etc/client.keys
     - require:
       - pkg: ossec-agent-packages
 
 {# OSSEC authd agent connects to master and registers its key #}
 agent-auth:
   cmd.wait:
-    - name: sleep 1 && {{ ossec_map.userdir }}/bin/agent-auth -m {{ ossec_map.server_ip }} -p 1515
-    - unless: stat {{ ossec_map.userdir }}/etc/client.keys
-    - watch: 
+    - name: sleep 1 && {{ ossec_map.lookup.locations.base_dir }}/bin/agent-auth -m {{ ossec_map.config.server_ip }} -p {{ ossec_map.config.server_port }}
+    - unless: stat {{ ossec_map.lookup.locations.base_dir }}/etc/client.keys
+    - watch:
       - cmd: server-auth
 
 {# We are done creating our key so lets shut down the ossec-auth process on the master using reactor #}
@@ -35,9 +34,10 @@ server-auth-shutdown:
 {# Start the OSSEC services on the agent #}
 ossec-service:
   service.running:
-    - name: ossec-hids
+    - name: {{ ossec_map.lookup.service_name }}
     - enable: True
     - sig: ossec-syscheckd
     - require:
       - pkg: ossec-agent-packages
       - cmd: agent-auth
+{% endif %}

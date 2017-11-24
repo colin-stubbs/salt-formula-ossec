@@ -1,21 +1,15 @@
-{% set ossec_map = salt['grains.filter_by']({
-    'default': {
-        'source_file': 'ossec-hids-2.9.1.tar.gz',
-        'language': 'en',
-        'userdir': '/var/ossec',
-        'en_active_response': 'y',
-        'en_syscheck': 'y',
-        'en_rootcheck': 'y',
-        'en_update_rules': 'y',
-        'en_syslog': 'y',
-        'server_ip': '172.16.0.4',
-        'en_email': 'n',
-        'email_address': 'disabled',
-        'white-list': '172.16.0.0/24',
-        'uid': '7000',
-        'gid': '7000'
-    },
-},
-merge=salt['pillar.get']('ossec:lookup', {}),
-default='default')
+{% import_yaml "ossec/defaults.yaml" as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+  'default': {
+  },
+}, grain='os_family', default='default', merge=salt['pillar.get']('ossec:lookup', {}))
+%}
+
+{% do default_settings.ossec.update(os_family_map) %}
+
+{% set ossec_map = salt['pillar.get'](
+    'ossec',
+    default=default_settings.ossec,
+    merge=True)
 %}

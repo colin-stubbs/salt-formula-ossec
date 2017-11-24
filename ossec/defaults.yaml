@@ -1,0 +1,41 @@
+ossec:
+  lookup:
+    server:
+      pkgs:
+        - ossec-hids
+        - ossec-hids-server
+    agent:
+      pkgs:
+        - ossec-hids
+        - ossec-hids-agent
+    locations:
+      base_dir: /var/ossec
+      etc_dir: /var/ossec/etc
+      rules_dir: /var/ossec/rules
+      templates_dir: /var/ossec/etc/templates
+    service_name: ossec-hids
+    user: ossec
+    user_r: ossecr
+    user_m: ossecm
+    user_e: ossece
+    group: ossec
+  manage_repo: True
+  manage_internal_options: False
+  role: agent
+  server_ip: 203.0.113.0
+  server_port: 1515
+  config:
+    internal_options:
+      source_file: source://ossec/files/internal_options.conf
+    templates:
+      source_dir: source://ossec/files/templates
+    shared:
+      source_dir: source://ossec/files/shared
+    decoders_d:
+      source_dir: source://ossec/files/decoders.d
+    rules_d:
+      source_dir: source://ossec/files/rules.d
+    ossec_agent_conf:
+      source_file: salt://ossec/files/ossec-agent.conf
+    ossec_server_conf:
+      source_file: salt://ossec/files/ossec-server.conf

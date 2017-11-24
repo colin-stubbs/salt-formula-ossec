@@ -1,0 +1,16 @@
+ossec:
+  role: agent
+  config:
+    language: en
+    userdir: /var/ossec
+    en_active_response: y
+    en_syscheck: y
+    en_rootcheck: y
+    en_update_rules: y
+    en_syslog: y
+    server_ip: 172.16.0.4
+    en_email: n
+    email_address: disabled
+    white-list: 172.16.0.0/24
+    uid: 7000
+    gid: 7000

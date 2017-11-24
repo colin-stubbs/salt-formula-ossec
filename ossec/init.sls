@@ -1,5 +1,6 @@
 {% from "ossec/map.jinja" import ossec_map with context %}
 
+{% if ossec_map.manage_repo == True %}
 ossec-repo-gpg-key-art:
   file.managed:
     - name: /etc/pki/rpm-gpg/RPM-GPG-KEY.art.txt
@@ -34,10 +35,11 @@ ossec-repo:
     - require:
       - file: ossec-repo-gpg-key-art
       - file: ossec-repo-gpg-key-atomicorp
+{% endif %}
 
-ossec-packages:
-  pkg.installed:
-    - pkgs:
-      - ossec-hids
-    - require:
-      - pkgrepo: ossec-repo
+include:
+{% if ossec_map.role == 'server' %}
+  - ossec.server
+{% else %}
+  - ossec.agent
+{% endif %}
