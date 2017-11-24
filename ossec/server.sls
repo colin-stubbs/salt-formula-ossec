@@ -61,7 +61,7 @@ ossec-service:
       {% if ossec_map.manage_internal_options == True %}
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/internal_options.conf:
       {% endif %}
-      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/templates
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/shared
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/decoders.d
@@ -71,7 +71,7 @@ ossec-service:
       {% if ossec_map.manage_internal_options == True %}
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/internal_options.conf:
       {% endif %}
-      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf:
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-server.conf
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/templates
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/shared
       - file: {{ ossec_map.lookup.locations.base_dir }}/etc/decoders.d
