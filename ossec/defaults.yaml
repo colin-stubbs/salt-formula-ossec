@@ -23,7 +23,7 @@ ossec:
   manage_internal_options: False
   role: agent
   server_ip: 203.0.113.0
-  server_port: 1515
+  server_port: 1514
   config:
     internal_options:
       source_file: source://ossec/files/internal_options.conf
