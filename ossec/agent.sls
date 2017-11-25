@@ -19,7 +19,7 @@ server-auth:
 {# OSSEC authd agent connects to master and registers its key #}
 agent-auth:
   cmd.wait:
-    - name: sleep 1 && {{ ossec_map.lookup.locations.base_dir }}/bin/agent-auth -m {{ ossec_map.config.server_ip }} -p {{ ossec_map.config.server_port }}
+    - name: sleep 1 && {{ ossec_map.lookup.locations.base_dir }}/bin/agent-auth -m {{ ossec_map.server_ip }} -p {{ ossec_map.server_port }}
     - unless: stat {{ ossec_map.lookup.locations.base_dir }}/etc/client.keys
     - watch:
       - cmd: server-auth
