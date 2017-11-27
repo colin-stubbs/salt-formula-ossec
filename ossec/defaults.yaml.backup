@@ -1,0 +1,111 @@
+ossec:
+  lookup:
+    server:
+      pkgs:
+        - ossec-hids
+        - ossec-hids-server
+      rules:
+        - include: rules_config.xml
+        - include: local_rules.xml
+      syscheck:
+        frequency: 72000
+        'directories check_all="yes"':
+          - '/etc,/usr/bin,/usr/sbin'
+          - '/bin,/sbin,/boot'
+        ignore:
+          - /etc/mtab
+          - /etc/hosts.deny
+          - /etc/mail/statistics
+          - /etc/random-seed
+          - /etc/adjtime
+          - /etc/httpd/logs
+        nodiff:
+          - /etc/ssl/private.key
+      rootcheck:
+        rootkit_files:
+          - /var/ossec/etc/shared/rootkit_files.txt
+        rootkit_trojans:
+          - /var/ossec/etc/shared/rootkit_trojans.txt
+
+    agent:
+      pkgs:
+        - ossec-hids
+        - ossec-hids-agent
+    locations:
+      base_dir: /var/ossec
+    service_name: ossec-hids
+    user: ossec
+    user_r: ossecr
+    user_m: ossecm
+    user_e: ossece
+    group: ossec
+  manage_repo: True
+  manage_internal_options: False
+  role: agent
+  server_ip: 203.0.113.0
+  config:
+    ossec_agent:
+      ossec_config:
+        syscheck:
+          frequency: 21600
+          scan_on_start: 'yes'
+          skip_nfs: 'yes'
+          alert_new_files: 'yes'
+          auto_ignore: 'no'
+    ossec_server:
+      ossec_config:
+        global:
+          email_notification: 'yes'
+          email_to: 'root'
+          smtp_server: 'smtp.example.com'
+          email_from: 'ossecm@ossec.example.com'
+        global:
+          white_list:
+            - 127.0.0.1
+            - '::1'
+            - 192.168.2.1
+            - 192.168.2.190
+            - 192.168.2.32
+            - 192.168.2.10
+        remote:
+          connection: secure
+        alerts:
+          log_alert_level: 1
+          email_alert_level: 7
+        commands:
+          host-deny:
+            name: host-deny
+            executable: host-deny.sh
+            expect: srcip
+            timeout_allowed: 'yes'
+          disable-account:
+            name: disable-account
+            executable: disable-account.sh
+            expect: user
+            timeout_allowed: 'yes'
+        active-responses:
+          host-deny:
+            command: host-deny
+            location: local
+            level: 6
+            timeout: 600
+          firewall-drop:
+            command: firewall-drop
+            location: local
+            level: 6
+            timeout: 600
+        local_files:
+          /var/log/messages:
+            log_format: syslog
+          /var/log/authlog:
+            log_format: syslog
+          /var/log/secure:
+            log_format: syslog
+          /var/log/xferlog:
+            log_format: syslog
+          /var/log/maillog:
+            log_format: syslog
+          /var/www/logs/access_log:
+            log_format: apache
+          /var/www/logs/error_log:
+            log_format: apache

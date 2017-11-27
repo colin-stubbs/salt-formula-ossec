@@ -31,13 +31,33 @@ server-auth-shutdown:
     - watch:
       - cmd: agent-auth
 
+{{ ossec_map.lookup.locations.base_dir }}/etc/ossec-agent.conf:
+  file.managed:
+{% if ossec_map.config.ossec_agent_conf.source|default('pillar') == 'pillar' %}
+    - source: salt://ossec/files/ossec-agent.conf.jinja
+    - template: jinja
+    - context:
+      ossec_map: {{ ossec_map }}
+{% elif 'source_file' in ossec_map.config.ossec_agent_conf %}
+    - source: {{ ossec_map.config.ossec_agent_conf.source_file }}
+{% endif %}
+    - user: root
+    - group: root
+    - mode: 0644
+    - require:
+      - pkg: ossec-agent-packages
+
 {# Start the OSSEC services on the agent #}
 ossec-service:
   service.running:
     - name: {{ ossec_map.lookup.service_name }}
     - enable: True
     - sig: ossec-syscheckd
+    - watch:
+      - pkg: ossec-agent-packages
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-agent.conf
     - require:
       - pkg: ossec-agent-packages
+      - file: {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-agent.conf
       - cmd: agent-auth
 {% endif %}

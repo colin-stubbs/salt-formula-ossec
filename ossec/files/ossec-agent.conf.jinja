@@ -1,0 +1,26 @@
+<!-- {{ ossec_map.lookup.locations.base_dir }}/etc/ossec-agent.conf -->
+
+<!-- WARNING: This file is managed by Salt Stack -->
+
+<ossec_config>
+  {%- if not 'client' in ossec_map.config.ossec_agent_conf or not 'server-ip' in ossec_map.config.ossec_agent_conf.client %}
+  {%- if 'server_ip' in ossec_map.config %}
+  <client>
+    <server-ip>{{ ossec_map.config.server_ip }}
+  </client>
+  {%- endif %}
+  {%- endif %}
+  {%- for section in ossec_map.config.ossec_agent_conf.ossec_config %}
+  {%- for section_name, section_dict in section.items() %}
+  <{{ section_name }}>
+  {%- for avp in section_dict %}
+  {%- for attribute_name, value in avp.items() %}
+    <{{ attribute_name }}>{{ value }}</{{ attribute_name.split()[0] }}>
+  {%- endfor %}
+  {%- endfor %}
+  </{{ section_name.split()[0] }}>
+  {%- endfor %}
+  {%- endfor %}
+</ossec_config>
+
+<!-- EOF -->

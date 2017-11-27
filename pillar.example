@@ -2,6 +2,70 @@ ossec:
   role: agent
   server_ip: 203.0.113.0
   server_port: 1515
+  config:
+    ossec_agent_conf:
+    - syscheck:
+      - frequency: 21600
+      - scan_on_start: 'yes'
+      - skip_nfs: 'yes'
+      - alert_new_files: 'yes'
+      - auto_ignore: 'no'
+      - 'directories realtime="yes" check_all="yes" report_changes="yes"': /boot
+      - 'directories realtime="yes" check_all="yes" report_changes="yes"': /etc
+      - 'directories realtime="yes" check_all="yes" report_changes="yes"': /usr/local/etc
+      - 'directories realtime="yes" check_all="yes"': /bin
+      - 'directories realtime="yes" check_all="yes"': /usr/bin
+      - 'directories realtime="yes" check_all="yes"': /sbin
+      - 'directories realtime="yes" check_all="yes"': /usr/sbin
+      - 'directories realtime="yes" check_all="yes"': /lib,/lib64,/usr/lib,/usr/lib64
+      - 'directories realtime="yes" check_all="yes"': /usr/local/bin
+      - 'directories realtime="yes" check_all="yes"': /usr/local/sbin
+      - 'directories realtime="yes" check_all="yes"': /usr/local/lib
+      - 'directories realtime="yes" check_all="yes"': /usr/local/lib64
+      - ignore: /etc/mtab
+      - ignore: /etc/hosts.deny
+      - ignore: /etc/mail/statistics
+      - ignore: /etc/random-seed
+      - ignore: /etc/random.seed
+      - ignore: /etc/adjtime
+      - ignore: /etc/httpd/logs
+      - ignore: /etc/utmpx
+      - ignore: /etc/wtmpx
+      - ignore: /etc/cups/certs
+      - ignore: /etc/dumpdates
+      - ignore: /etc/svc/volatile
+      - nodiff: /etc/ssl/private.key
+    - rootcheck:
+      - disabled: 'no'
+      - skip_nfs: 'yes'
+      - system_audit: /var/ossec/etc/shared/system_audit_rcl.txt
+      - system_audit: /var/ossec/etc/shared/system_audit_ssh.txt
+      - system_audit: /var/ossec/etc/shared/cis_rhel5_linux_rcl.txt
+      - system_audit: /var/ossec/etc/shared/cis_rhel6_linux_rcl.txt
+      - system_audit: /var/ossec/etc/shared/cis_rhel7_linux_rcl.txt
+      - rootkit_files: /var/ossec/etc/shared/rootkit_files.txt
+      - rootkit_trojans: /var/ossec/etc/shared/rootkit_trojans.txt
+    - localfile:
+      - log_format: syslog
+      - location: /var/log/messages
+    - localfile:
+      - log_format: syslog
+      - location: /var/log/authlog
+    - localfile:
+      - log_format: syslog
+      - location: /var/log/secure
+    - localfile:
+      - log_format: syslog
+      - location: /var/log/xferlog
+    - localfile:
+      - log_format: syslog
+      - location: /var/log/maillog
+    - localfile:
+      - log_format: apache
+      - location: /var/www/logs/access_log
+    - localfile:
+      - log_format: apache
+      - location: /var/www/logs/error_log
 
 ossec:
   role: server
