@@ -3,10 +3,9 @@
 <!-- WARNING: This file is managed by Salt Stack -->
 
 <ossec_config>
-  {%- if not 'client' in ossec_map.config.ossec_agent_conf or not 'server-ip' in ossec_map.config.ossec_agent_conf.client %}
-  {%- if 'server_ip' in ossec_map.config %}
+  {%- if not 'client' in ossec_map.config.ossec_agent_conf.ossec_config and 'server_ip' in ossec_map %}
   <client>
-    <server-ip>{{ ossec_map.config.server_ip }}
+    <server-ip>{{ ossec_map.server_ip }}
   </client>
   {%- endif %}
   {%- endif %}
