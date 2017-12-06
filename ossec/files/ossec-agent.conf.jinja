@@ -6,10 +6,10 @@
   {%- if not 'client' in ossec_map.config.ossec_agent_conf.ossec_config %}
   {%- if 'server_ip' in ossec_map %}
   <client>
-    <server-ip>{{ ossec_map.server_ip }}
+    <server-ip>{{ ossec_map.server_ip }}</server-ip>
     {%- if 'server_port' in ossec_map %}
-    <port>{{ ossec_map.server_port }}
-    <%- endif %}
+    <port>{{ ossec_map.server_port }}</port>
+    {%- endif %}
   </client>
   {%- endif %}
   {%- endif %}
