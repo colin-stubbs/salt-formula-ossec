@@ -2,11 +2,39 @@
 
 {% set os_family_map = salt['grains.filter_by']({
   'default': {
+    'packages': {
+      'server': [
+        'ossec-hids',
+        'ossec-hids-server'
+      ],
+      'agent': [
+        'ossec-hids',
+        'ossec-hids-agent'
+      ],
+    },
+    'locations': {
+      'base_dir': '/var/ossec',
+      'etc_dir': '/var/ossec/etc',
+      'client_keys': '/var/ossec/etc/client.keys',
+      'server_config': '/var/ossec/etc/ossec-server.conf',
+      'agent_config': '/var/ossec/etc/ossec-agent.conf',
+      'internal_options_config': '/var/ossec/etc/internal_options.conf',
+      'shared_dir': '/var/ossec/etc/shared',
+      'decoders_dir': '/var/ossec/etc/decoders.d',
+      'rules_dir': '/var/ossec/rules',
+      'templates_dir': '/var/ossec/etc/templates',
+    },
+    'service_name': 'ossec-hids',
+    'user': 'ossec',
+    'user_r': 'ossecr',
+    'user_m': 'ossecm',
+    'user_e': 'ossece',
+    'group': 'ossec',
   },
 }, grain='os_family', default='default', merge=salt['pillar.get']('ossec:lookup', {}))
 %}
 
-{% do default_settings.ossec.update(os_family_map) %}
+{% do default_settings.ossec.lookup.update(os_family_map) %}
 
 {% set ossec_map = salt['pillar.get'](
     'ossec',
